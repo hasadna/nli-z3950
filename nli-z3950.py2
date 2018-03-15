@@ -1,0 +1,53 @@
+#!/usr/bin/env python2
+from PyZ3950 import zoom
+import pymarc, sys, os
+from time import sleep
+
+
+if len(sys.argv) < 3:
+    print("Usage: nli-z3950 <DB_NAME> <CCL_QUERY> [BINARY_MARC_SEPARATOR]")
+    print("DB_NAME - National Library Z3950 DB Name, one of:")
+    print("    ULI02 - The Israel Union List (ULI)")
+    print("    NNL10 - National Library Name Authority File")
+    print("CCL_QUERY - see https://software.indexdata.com/yaz/doc/tools.html#CCL")
+    print("BINARY_MARC_SEPARATOR - (optional) - "
+          "outputs using MARC binary format with the given separator between records")
+    exit(1)
+
+
+i = 0
+marc_separator = sys.argv[3] if len(sys.argv) > 3 else None
+if not marc_separator:
+    print('[')
+ccl_query = sys.argv[2].decode('UTF-8')
+if os.environ.get("CCL_QUERY_WRAP_QUOTES"):
+    ccl_query = '"' + ccl_query + '"'
+max_records_per_page = 1000
+page_number = 1
+while True:
+    sys.stderr.write("Getting page {}\n".format(page_number))
+    num_records = 0
+    conn = zoom.Connection('uli.nli.org.il', 9991)
+    conn.databaseName = sys.argv[1]
+    conn.preferredRecordSyntax = 'USMARC'
+    conn.elementSetName = 'F'
+    # TODO: check if this actually supports pagination, not sure..
+    for r in conn.search(zoom.Query('CCL', ccl_query))[i:i+max_records_per_page]:
+        for record in pymarc.MARCReader(r.data):
+            if marc_separator:
+                if i > 0: print(marc_separator)
+                print(record.as_marc())
+            else:
+                if i > 0: print(',')
+                print(record.as_json())
+            i += 1
+            num_records += 1
+    if num_records == 0:
+        sys.stderr.write("Got 0 records, stopping\n")
+        break
+    else:
+        sys.stderr.write("Got {} records\n".format(num_records))
+        sleep(1)
+        page_number += 1
+if not marc_separator:
+    print(']')

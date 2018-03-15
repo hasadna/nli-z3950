@@ -1,0 +1,6 @@
+load_marc_data:
+  pipeline:
+  - run: load_marc_data
+  - run: dump.to_path
+    parameters:
+      out-path: data/load_marc_data
