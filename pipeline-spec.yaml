@@ -4,3 +4,39 @@ load_marc_data:
   - run: dump.to_path
     parameters:
       out-path: data/load_marc_data
+
+
+search:
+  pipeline:
+  - run: add_resource
+    parameters:
+      name: ccl_queries
+      url: data/search_ccl_queries.csv
+  - run: stream_remote_resources
+  - run: search
+    parameters:
+      max-records: 500
+  - run: join
+    parameters:
+      source:
+        name: records
+        key: "{title}:{pubyear}"
+      target:
+        name: unique_records
+        key: null
+      fields:
+        title:
+        pubyear:
+        uniformtitle:
+        author:
+        isbn:
+        json:
+  - run: set_metadata
+    code: |
+      from datapackage_pipelines.wrapper import ingest, spew
+      parameters, datapackage, resources, stats = ingest() + ({},)
+      datapackage['resources'][1]["path"] = "unique_records.csv"
+      spew(datapackage, resources, stats)
+  - run: dump.to_path
+    parameters:
+      out-path: data/search_results

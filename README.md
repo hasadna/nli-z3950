@@ -7,16 +7,23 @@ The script dumps JSON serialization of the MARC data by default, optionally it c
 
 ## Usage
 
-Get datapackage of records containing the text "בדיקה"
+Get records for the given search phrases
+
+Requires a csv file under `data/search_phrases.csv` which contains a single `search_phrase` column where each row should contain a single keyword or phrase
 
 ```
-docker run -e NLI_DB_NAME=ULI02 \
-           -e 'NLI_CCL_QUERY="בדיקה אחת שתיים שלוש"' \
-           -v `pwd`/data:/data \
-           orihoch/nli-z3950 run ./load_marc_data
+docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run ./keywords-search
 ```
 
-Datapackages are available under `data/` directory
+Output data will be available under `data` directory
+
+Get datapackage of records using CCL query "בדיקה"
+
+```
+docker run -it -v `pwd`/data:/data \
+           -e NLI_DB_NAME=ULI02 \
+           -e 'NLI_CCL_QUERY="בדיקה"' orihoch/nli-z3950 run ./load_marc_data
+```
 
 Stream binary MARC21 data directly
 
@@ -25,13 +32,18 @@ docker run --entrypoint python orihoch/nli-z3950 nli-z3950.py2 ULI02 '"בדיק�
 ```
 
 
+## Using CCL Queries
+
+See https://software.indexdata.com/yaz/doc/tools.html#CCL for some examples
+
+
 ## Development
 
 Build and run locally
 
 ```
 docker build -t nli-z3950 . &&\
-docker run -e NLI_DB_NAME=ULI02 \
+docker run -it -e NLI_DB_NAME=ULI02 \
            -e 'NLI_CCL_QUERY="בדיקה"' \
            -v `pwd`/data:/data \
            nli-z3950 run --verbose ./load_marc_data

@@ -10,12 +10,16 @@ RUN curl https://bootstrap.pypa.io/get-pip.py > get-pip.py && python3.6 ./get-pi
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN pip install 'datapackage-pipelines[speedup,develop]'
+# RUN pip install 'datapackage-pipelines[speedup,develop]'
+# installing from master due to bug with --verbose, can change to normal pip installation once new version is released
+RUN curl -L 'https://github.com/frictionlessdata/datapackage-pipelines/archive/master.zip' > datapackage-pipelines.zip &&\
+    pip install 'datapackage-pipelines.zip[speedup,develop]'
 RUN pip install pymarc
 
-COPY *.py ./
-COPY *.py2 ./
-COPY *.sh ./
-COPY *.yaml ./
+COPY nli_z3950/*.py /nli_z3950/
+COPY setup.py /
+RUN pip install -e .
+
+COPY *.py *.py2 *.sh *.yaml ./
 
 ENTRYPOINT ["./entrypoint.sh"]
