@@ -7,22 +7,20 @@ The script dumps JSON serialization of the MARC data by default, optionally it c
 
 ## Usage
 
-Get datapackage of records containing the text "בדיקה"
+Get records for a list of [CCL queries](https://software.indexdata.com/yaz/doc/tools.html#CCL)
+
+Search queries should be provided in `data/search_ccl_queries.csv` with a single `ccl_query` column
 
 ```
-docker run -e NLI_DB_NAME=ULI02 \
-           -e 'NLI_CCL_QUERY="בדיקה אחת שתיים שלוש"' \
-           -v `pwd`/data:/data \
-           orihoch/nli-z3950 run ./load_marc_data
+docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run ./search
 ```
 
-Datapackages are available under `data/` directory
+Output data will be available under `data/search_results` directory
 
-Stream binary MARC21 data directly
 
-```
-docker run --entrypoint python orihoch/nli-z3950 nli-z3950.py2 ULI02 '"בדיקה"' ----------
-```
+## Using CCL Queries
+
+See https://software.indexdata.com/yaz/doc/tools.html#CCL for some examples
 
 
 ## Development
@@ -31,19 +29,7 @@ Build and run locally
 
 ```
 docker build -t nli-z3950 . &&\
-docker run -e NLI_DB_NAME=ULI02 \
+docker run -it -e NLI_DB_NAME=ULI02 \
            -e 'NLI_CCL_QUERY="בדיקה"' \
-           -v `pwd`/data:/data \
-           nli-z3950 run --verbose ./load_marc_data
-```
-
-Build in the Google cloud
-
-```
-IMAGE_TAG=gcr.io/hasadna-oknesset/nli-z3950
-CLOUDSDK_CORE_PROJECT=hasadna-oknesset
-PROJECT_NAME=nli-z3950
-gcloud container builds submit --substitutions _IMAGE_TAG=${IMAGE_TAG},_CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT},_PROJECT_NAME=${PROJECT_NAME} \
-                               --config cloudbuild.yaml . &&\
-gcloud docker -- pull gcr.io/hasadna-oknesset/nli-z3950-latest
+           -v `pwd`/data:/data orihoch/nli-z3950 run --verbose ./search
 ```

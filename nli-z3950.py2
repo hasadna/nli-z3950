@@ -45,6 +45,9 @@ while True:
     if num_records == 0:
         sys.stderr.write("Got 0 records, stopping\n")
         break
+    elif num_records < max_records_per_page:
+        sys.stderr.write("Got {} records, which is less then max records per page of {}, stopping\n".format(num_records, max_records_per_page))
+        break
     else:
         sys.stderr.write("Got {} records\n".format(num_records))
         sleep(1)
