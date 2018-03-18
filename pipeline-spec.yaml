@@ -14,8 +14,8 @@ search:
       url: data/search_ccl_queries.csv
   - run: stream_remote_resources
   - run: search
-    parameters:
-      max-records: 500
+#    parameters:
+#      max-records: 500
   - run: join
     parameters:
       source:
