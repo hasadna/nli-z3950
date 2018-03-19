@@ -6,13 +6,28 @@ load_marc_data:
       out-path: data/load_marc_data
 
 
-search:
+get_ccl_queries_from_lc_topics:
   pipeline:
   - run: add_resource
     parameters:
-      name: ccl_queries
-      url: data/search_ccl_queries.csv
+      name: topics
+      url: data/topics.xlsx
+      format: xlsx
+      sheet: "LC"
   - run: stream_remote_resources
+  - run: topics_to_ccl_queries
+  - run: dump.to_path
+    parameters:
+      out-path: data/ccl_queries
+      resources: .*
+
+
+search:
+  pipeline:
+  - run: load_resource
+    parameters:
+      url: data/ccl_queries/datapackage.json
+      resource: ccl_queries
   - run: search
 #    parameters:
 #      max-records: 500
@@ -20,23 +35,30 @@ search:
     parameters:
       source:
         name: records
-        key: "{title}:{pubyear}"
+        key: "{title}"
       target:
         name: unique_records
         key: null
       fields:
+        num_duplicates:
+          name: ccl_query
+          aggregate: count
+        ccl_queries:
+          name: ccl_query
+          aggregate: set
         title:
         pubyear:
         uniformtitle:
         author:
         isbn:
-        json:
-  - run: set_metadata
-    code: |
-      from datapackage_pipelines.wrapper import ingest, spew
-      parameters, datapackage, resources, stats = ingest() + ({},)
-      datapackage['resources'][1]["path"] = "unique_records.csv"
-      spew(datapackage, resources, stats)
+        # json:
+        language_code:
+        custom_metadata:
+        publication_distribution_details:
+        physical_description:
+        notes:
+        tags:
+        url:
   - run: dump.to_path
     parameters:
       out-path: data/search_results
