@@ -1,5 +1,5 @@
 from datapackage_pipelines.wrapper import ingest, spew
-import logging, re
+import logging, re, json
 
 
 parameters, datapackage, resources, stats = ingest() + ({'num items without url': 0,
@@ -32,6 +32,16 @@ def get_url(row):
         return None
 
 
+def get_value(row, k):
+    v = row[k]
+    if not v:
+        return ''
+    elif k == 'json':
+        return json.dumps(v)
+    else:
+        return str(v)
+
+
 def is_valid_row(row):
     if row['url']:
         return True
@@ -44,7 +54,7 @@ def get_resource(resource):
     for row in resource:
         row['url'] = get_url(row)
         if is_valid_row(row):
-            row = {k: (str(v) if v else '') for k, v in row.items() if k in export_keys}
+            row = {k: get_value(row, k) for k, v in row.items() if k in export_keys}
             yield row
 
 
