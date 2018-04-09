@@ -90,22 +90,37 @@ search_export:
       export_keys:
       - title
       - pubyear
-#      - 'publisher'
-#      - 'uniformtitle'
-#      - 'author'
-#      - 'isbn'
-#      - 'language_code'
-#      - 'custom_metadata'
-#      - 'publication_distribution_details'
-#      - 'physical_description'
-#      - 'notes'
-#      - 'tags'
-#      - 'url'
-#      - 'migdar_id'
-      - item_type_999
-      - item_type_964
-      - item_type_leader
-      - bibliographic_level
+      - publisher
+      - uniformtitle
+      - author
+      - isbn
+      - language_code
+      - custom_metadata
+      - publication_distribution_details
+      - physical_description
+      - notes
+      - tags
+      - url
+      - migdar_id
+#      - item_type_999
+#      - item_type_964
+#      - item_type_leader
+#      - bibliographic_level
+      - item_type
+      - first_ccl_query
+      - json
+  - run: sort
+    parameters:
+      resources: search_export
+      sort-by: "{first_ccl_query}"
+  - run: search_export_to_zotero
+    parameters:
+      resource: search_export
+      out-path: data/search_export
+  - run: set_types
+    parameters:
+      types:
+        json: null
   - run: dump.to_path
     parameters:
       out-path: data/search_export

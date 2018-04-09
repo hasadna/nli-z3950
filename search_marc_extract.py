@@ -34,7 +34,16 @@ def get_resource(resource):
             elif 'marc_leader_position' in output_field and 'marc_leader_map' in output_field:
                 key = row['json']['leader'][output_field['marc_leader_position']]
                 row[output_field['name']] = output_field['marc_leader_map'][key]
-        yield row
+        if row.get('item_type_999'):
+            row['item_type'] = row['item_type_999']
+        elif row.get('item_type_leader') == 'Language material' and row.get('bibliographic_level') == 'Monograph/Item':
+            row['item_type'] = 'book'
+        else:
+            row['item_type'] = None
+        if row['item_type']:
+            yield row
+        else:
+            logging.info('could not determine item type: {}'.format((row.get('item_type_999'), row.get('item_type_leader'), row.get('bibliographic_level'))))
 
 
 def get_resources():
