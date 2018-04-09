@@ -7,7 +7,7 @@ The script dumps JSON serialization of the MARC data by default, optionally it c
 
 ## Usage
 
-Get records for a list of [CCL queries](https://software.indexdata.com/yaz/doc/tools.html#CCL)
+### Getting records for a list of [CCL queries](https://software.indexdata.com/yaz/doc/tools.html#CCL)
 
 Search queries should be provided in `data/ccl_queries/ccl_queries.csv` with a single `ccl_query` column
 
@@ -25,11 +25,19 @@ See https://software.indexdata.com/yaz/doc/tools.html#CCL for some examples
 
 ## Development
 
+### Using Docker
+
 Build and run locally
 
 ```
 docker build -t nli-z3950 . &&\
-docker run -it -e NLI_DB_NAME=ULI02 \
-           -e 'NLI_CCL_QUERY="בדיקה"' \
-           -v `pwd`/data:/data orihoch/nli-z3950 run --verbose ./search
+docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run --verbose ./search
+```
+
+### Locally
+
+See the Dockerfile for installation instructions. You need both Python 2.7 and Python 3.6 and some dependencies.
+
+```
+NLI_PYTHON2=python2 MAX_RECORDS=50 dpp run --verbose ./search
 ```

@@ -26,39 +26,48 @@ search:
   pipeline:
   - run: load_resource
     parameters:
+      url: data/search_results/datapackage.json
+      resource: unique_records
+  - run: load_resource
+    parameters:
+      url: data/search_results/datapackage.json
+      resource: query_stats
+  - run: load_resource
+    parameters:
       url: data/ccl_queries/datapackage.json
       resource: ccl_queries
   - run: search
-#    parameters:
-#      max-records: 500
-  - run: join
-    parameters:
-      source:
-        name: records
-        key: "{title}"
-      target:
-        name: unique_records
-        key: null
-      fields:
-        num_duplicates:
-          name: ccl_query
-          aggregate: count
-        ccl_queries:
-          name: ccl_query
-          aggregate: set
-        title:
-        pubyear:
-        uniformtitle:
-        author:
-        isbn:
-        # json:
-        language_code:
-        custom_metadata:
-        publication_distribution_details:
-        physical_description:
-        notes:
-        tags:
-        url:
   - run: dump.to_path
     parameters:
       out-path: data/search_results
+
+
+search_export:
+  pipeline:
+  - run: load_resource
+    parameters:
+      url: data/search_results/datapackage.json
+      resource: unique_records
+  - run: search_filter
+    parameters:
+      min_year: 2005
+  - run: search_export
+    parameters:
+      export_keys:
+      - 'title'
+      - 'pubyear'
+      - 'publisher'
+      - 'uniformtitle'
+      - 'author'
+      - 'isbn'
+      - 'language_code'
+      - 'custom_metadata'
+      - 'publication_distribution_details'
+      - 'physical_description'
+      - 'notes'
+      - 'tags'
+      - 'url'
+      - 'migdar_id'
+  - run: dump.to_path
+    parameters:
+      out-path: data/search_export

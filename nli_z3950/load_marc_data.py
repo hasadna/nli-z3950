@@ -1,4 +1,4 @@
-import subprocess, logging, json, pymarc
+import subprocess, logging, json, pymarc, os
 from pymarc import JSONReader
 
 
@@ -37,7 +37,7 @@ def get_marc_records_schema():
 
 
 def load_marc_data(db_name, ccl_query, stats):
-    res = subprocess.run(["python", "nli-z3950.py2", db_name, ccl_query],
+    res = subprocess.run([os.environ.get('NLI_PYTHON2', "python"), "nli-z3950.py2", db_name, ccl_query],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     logging.info(res.stderr.decode('utf-8'))
     if res.returncode == 0:
