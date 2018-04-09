@@ -51,23 +51,61 @@ search_export:
   - run: search_filter
     parameters:
       min_year: 2005
+  - run: search_marc_extract
+    parameters:
+      fields:
+      - name: item_type_999
+        marc_tag: "999"
+      - name: item_type_964
+        marc_tag: "964"
+      - name: item_type_leader
+        marc_leader_position: 6
+        marc_leader_map:
+          a: Language material
+          c: Notated music
+          d: Manuscript notated music
+          e: Cartographic material
+          f: Manuscript cartographic material
+          g: Projected medium
+          i: Nonmusical sound recording
+          j: Musical sound recording
+          k: Two-dimensional nonprojectable graphic
+          m: Computer file
+          o: Kit
+          p: Mixed materials
+          r: Three-dimensional artifact or naturally occurring object
+          t: Manuscript language material
+      - name: bibliographic_level
+        marc_leader_position: 7
+        marc_leader_map:
+          a: Monographic component part
+          b: Serial component part
+          c: Collection
+          d: Subunit
+          i: Integrating resource
+          m: Monograph/Item
+          s: Serial
   - run: search_export
     parameters:
       export_keys:
-      - 'title'
-      - 'pubyear'
-      - 'publisher'
-      - 'uniformtitle'
-      - 'author'
-      - 'isbn'
-      - 'language_code'
-      - 'custom_metadata'
-      - 'publication_distribution_details'
-      - 'physical_description'
-      - 'notes'
-      - 'tags'
-      - 'url'
-      - 'migdar_id'
+      - title
+      - pubyear
+#      - 'publisher'
+#      - 'uniformtitle'
+#      - 'author'
+#      - 'isbn'
+#      - 'language_code'
+#      - 'custom_metadata'
+#      - 'publication_distribution_details'
+#      - 'physical_description'
+#      - 'notes'
+#      - 'tags'
+#      - 'url'
+#      - 'migdar_id'
+      - item_type_999
+      - item_type_964
+      - item_type_leader
+      - bibliographic_level
   - run: dump.to_path
     parameters:
       out-path: data/search_export
