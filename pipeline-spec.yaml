@@ -48,7 +48,7 @@ search_export:
     parameters:
       url: data/search_results/datapackage.json
       resource: unique_records
-      limit-rows: 500
+#      limit-rows: 500
   - run: search_filter
     parameters:
       min_year: 2005
