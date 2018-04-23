@@ -48,6 +48,7 @@ search_export:
     parameters:
       url: data/search_results/datapackage.json
       resource: unique_records
+      limit-rows: 500
   - run: search_filter
     parameters:
       min_year: 2005
@@ -56,8 +57,10 @@ search_export:
       fields:
       - name: item_type_999
         marc_tag: "999"
+        first_subfield_only: true
       - name: item_type_964
         marc_tag: "964"
+        first_subfield_only: true
       - name: item_type_leader
         marc_leader_position: 6
         marc_leader_map:
@@ -85,19 +88,21 @@ search_export:
           i: Integrating resource
           m: Monograph/Item
           s: Serial
+      - name: marc_856
+        marc_tag: "856"
   - run: search_export
     parameters:
       export_keys:
       - title
       - pubyear
       - publisher
-      - uniformtitle
+#      - uniformtitle
       - author
-      - isbn
+#      - isbn
       - language_code
       - custom_metadata
       - publication_distribution_details
-      - physical_description
+#      - physical_description
       - notes
       - tags
       - url
@@ -109,14 +114,15 @@ search_export:
       - item_type
       - first_ccl_query
       - json
+      - marc_856
   - run: sort
     parameters:
       resources: search_export
       sort-by: "{first_ccl_query}"
-  - run: search_export_to_zotero
-    parameters:
-      resource: search_export
-      out-path: data/search_export
+#  - run: search_export_to_zotero
+#    parameters:
+#      resource: search_export
+#      out-path: data/search_export
   - run: set_types
     parameters:
       types:

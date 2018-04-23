@@ -26,9 +26,11 @@ def get_resource(resource):
                 for record in pymarc.JSONReader(json.dumps([row['json']])):
                     record_fields = record.get_fields(output_field['marc_tag'])
                     if len(record_fields) > 0:
-                        record_field = record_fields[0]
-                        row[output_field['name']] = record_field.format_field()
-                        break
+                        if output_field.get('first_subfield_only'):
+                            record_field = record_fields[0]
+                            row[output_field['name']] = record_field.format_field()
+                        else:
+                            row[output_field['name']] = ' | '.join([record_field.format_field() for record_field in record_fields])
                     else:
                         row[output_field['name']] = ''
             elif 'marc_leader_position' in output_field and 'marc_leader_map' in output_field:

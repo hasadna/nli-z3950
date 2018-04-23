@@ -41,3 +41,10 @@ See the Dockerfile for installation instructions. You need both Python 2.7 and P
 ```
 NLI_PYTHON2=python2 MAX_RECORDS=50 dpp run --verbose ./search
 ```
+
+### Sync with google storage
+
+```
+sudo chown -R $USER data
+gsutil -m rsync -r ./data gs://knesset-data-pipelines/hasadna-migdar-data/$USER-`date +%Y-%m-%d_%H-%m`
+```
