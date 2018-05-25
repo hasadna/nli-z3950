@@ -2,6 +2,7 @@ from datapackage_pipelines.wrapper import ingest, spew
 from datapackage_pipelines.utilities.resources import PROP_STREAMING
 import logging, os, json
 from nli_z3950.load_marc_data import load_marc_data, get_marc_records_schema
+import datetime
 
 
 parameters, datapackage, resources, stats = ingest() + ({},)
@@ -30,6 +31,8 @@ def get_resource():
     if is_stateful:
         for record in next(resources):
             all_records.append(get_record_key(record))
+            if 'last_query_datetime' not in record:
+                record['last_query_datetime'] = None
             yield record
         for row in next(resources):
             query_stats[row['ccl_query']] = {'num records': row['num_records']}
@@ -48,6 +51,7 @@ def get_resource():
                         yield dict(record,
                                    migdar_id=migdar_id,
                                    first_ccl_query=ccl_query,
+                                   last_query_datetime=datetime.datetime.now(),
                                    json=json.loads(record['json']))
                         stats['total yielded records'] += 1
                     stats["total search results"] += 1
@@ -68,7 +72,8 @@ def get_query_stats_resource():
 def get_unique_records_schema():
     schema = get_marc_records_schema()
     schema['fields'] += [{'name': 'migdar_id', 'type': 'integer'},
-                         {'name': 'first_ccl_query', 'type': 'string'}]
+                         {'name': 'first_ccl_query', 'type': 'string'},
+                         {'name': 'last_query_datetime', 'type': 'datetime'}]
     for field in schema['fields']:
         if field['name'] == 'json':
             field['type'] = 'object'

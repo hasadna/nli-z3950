@@ -4,7 +4,8 @@ from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 
 parameters, datapackage, resources, stats = ingest() + ({'valid rows': 0, 'invalid years': 0,
-                                                         'null years': 0, 'years not in range': 0},)
+                                                         'null years': 0, 'years not in range': 0,
+                                                         'migdar_id not in range': 0},)
 
 
 year_stats = {}
@@ -16,21 +17,24 @@ min_year = parameters['min_year']
 def get_resource():
     for resource in resources:
         for row in resource:
-            if row.get('pubyear'):
-                res = re.match('.*([12][0-9][0-9][0-9]).*', row['pubyear'])
-                if res:
-                    row['__year'] = year = int(res.group(1))
-                    if year >= min_year:
-                        yield row
-                        stats['valid rows'] += 1
+            if parameters.get('min_migdar_id') and row['migdar_id'] >= parameters['min_migdar_id']:
+                if row.get('pubyear'):
+                    res = re.match('.*([12][0-9][0-9][0-9]).*', row['pubyear'])
+                    if res:
+                        row['__year'] = year = int(res.group(1))
+                        if year >= min_year:
+                            yield row
+                            stats['valid rows'] += 1
+                        else:
+                            stats['years not in range'] += 1
+                        year_stats.setdefault(year, 0)
+                        year_stats[year] += 1
                     else:
-                        stats['years not in range'] += 1
-                    year_stats.setdefault(year, 0)
-                    year_stats[year] += 1
+                        stats['invalid years'] += 1
                 else:
-                    stats['invalid years'] += 1
+                    stats['null years'] += 1
             else:
-                stats['null years'] += 1
+                stats['migdar_id not in range'] += 1
 
 
 def get_year_stats_resource():

@@ -7,9 +7,11 @@ The script dumps JSON serialization of the MARC data by default, optionally it c
 
 ## Usage
 
-### Getting records for a list of [CCL queries](https://software.indexdata.com/yaz/doc/tools.html#CCL)
+### Stateful search using [CCL queries](https://software.indexdata.com/yaz/doc/tools.html#CCL)
 
 Search queries should be provided in `data/ccl_queries/ccl_queries.csv` with a single `ccl_query` column
+
+Search takes the result as input and only updates new entires
 
 ```
 docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run ./search
@@ -17,6 +19,11 @@ docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run ./search
 
 Output data will be available under `data/search_results` directory
 
+### Export search results
+
+```
+docker run -it -v `pwd`/data:/data orihoch/nli-z3950 run ./search_export
+```
 
 ## Using CCL Queries
 

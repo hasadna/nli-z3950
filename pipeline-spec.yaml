@@ -52,6 +52,8 @@ search_export:
   - run: search_filter
     parameters:
       min_year: 2005
+      # new results May 25, 2018
+      min_migdar_id: 86591
   - run: search_marc_extract
     parameters:
       fields:
