@@ -1,5 +1,6 @@
 from datapackage_pipelines.wrapper import ingest, spew
 import logging, re, json
+from nli_z3950.load_marc_data import get_export_url, get_export_value, is_valid_export_row, get_export_row
 
 
 parameters, datapackage, resources, stats = ingest() + ({'num items without url': 0,
@@ -17,44 +18,10 @@ for i, resource in enumerate(datapackage['resources']):
         unique_records_resource_num = i
 
 
-def get_url(row):
-    if row['url']:
-        res = re.match('.*(http([^\s]+)).*', row['url'])
-        if res:
-            return res.group(1)
-        else:
-            stats['num items with invalid url'] += 1
-            logging.info('item with invalid url: {}'.format(row['url']))
-            return None
-    else:
-        stats['num items without url'] += 1
-        logging.info('item without url')
-        return None
-
-
-def get_value(row, k):
-    v = row[k]
-    if not v:
-        return ''
-    elif k == 'json':
-        return json.dumps(v)
-    else:
-        return str(v)
-
-
-def is_valid_row(row):
-    if row['url']:
-        return True
-    else:
-        logging.info('invalid row: missing url')
-        return False
-
-
 def get_resource(resource):
     for row in resource:
-        row['url'] = get_url(row)
-        if is_valid_row(row):
-            row = {k: get_value(row, k) for k, v in row.items() if k in export_keys}
+        row = get_export_row(row, export_keys)
+        if row:
             yield row
 
 

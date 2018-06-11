@@ -1,6 +1,7 @@
 from datapackage_pipelines.wrapper import ingest, spew
 import re, logging
 from datapackage_pipelines.utilities.resources import PROP_STREAMING
+from nli_z3950.load_marc_data import get_pubyear
 
 
 parameters, datapackage, resources, stats = ingest() + ({'valid rows': 0, 'invalid years': 0,
@@ -18,21 +19,16 @@ def get_resource():
     for resource in resources:
         for row in resource:
             if parameters.get('min_migdar_id') and row['migdar_id'] >= parameters['min_migdar_id']:
-                if row.get('pubyear'):
-                    res = re.match('.*([12][0-9][0-9][0-9]).*', row['pubyear'])
-                    if res:
-                        row['__year'] = year = int(res.group(1))
-                        if year >= min_year:
-                            yield row
-                            stats['valid rows'] += 1
-                        else:
-                            stats['years not in range'] += 1
-                        year_stats.setdefault(year, 0)
-                        year_stats[year] += 1
+                pubyear = get_pubyear(row)
+                if pubyear:
+                    row['__year'] = pubyear
+                    if pubyear >= min_year:
+                        yield row
+                        stats['valid rows'] += 1
                     else:
-                        stats['invalid years'] += 1
+                        stats['years not in range'] += 1
                 else:
-                    stats['null years'] += 1
+                    stats['invalid years'] += 1
             else:
                 stats['migdar_id not in range'] += 1
 

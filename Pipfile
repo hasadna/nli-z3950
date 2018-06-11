@@ -1,20 +1,19 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 datapackage-pipelines = {extras = ["develop", "speedup"]}
 pymarc = "*"
-
+google-api-python-client = "*"
+google-auth = "*"
+"google-auth-httplib2" = "*"
+openpyxl = "*"
+flask = "*"
+python-slugify = "*"
 
 [dev-packages]
 
-
-
 [requires]
-
 python_version = "3.6"

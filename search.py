@@ -1,7 +1,7 @@
 from datapackage_pipelines.wrapper import ingest, spew
 from datapackage_pipelines.utilities.resources import PROP_STREAMING
 import logging, os, json
-from nli_z3950.load_marc_data import load_marc_data, get_marc_records_schema
+from nli_z3950.load_marc_data import load_marc_data, get_marc_records_schema, get_record_key
 import datetime
 
 
@@ -18,10 +18,6 @@ is_stateful = len(datapackage['resources']) == 3
 
 query_stats = {}
 all_records = []
-
-
-def get_record_key(record):
-    return '{}{}{}'.format(record['url'], record['tags'], record['title'])
 
 
 def get_resource():

@@ -1,4 +1,4 @@
-import subprocess, logging, json, pymarc, os
+import subprocess, logging, json, pymarc, os, re, sys
 from pymarc import JSONReader
 
 
@@ -39,7 +39,7 @@ def get_marc_records_schema():
 def load_marc_data(db_name, ccl_query, stats):
     res = subprocess.run([os.environ.get('NLI_PYTHON2', "python"), "nli-z3950.py2", db_name, ccl_query],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    logging.info(res.stderr.decode('utf-8'))
+    sys.stderr.write(res.stderr.decode('utf-8'))
     if res.returncode == 0:
         reader = JSONReader(res.stdout.decode('utf-8'))
         stats["num records"] = 0
@@ -64,5 +64,90 @@ def load_marc_data(db_name, ccl_query, stats):
             stats["num records"] += 1
             yield row
     else:
-        logging.info(res.stdout.decode('utf-8'))
+        sys.stderr.write(res.stdout.decode('utf-8'))
         raise Exception()
+
+
+def get_record_key(record):
+    return '{}{}{}'.format(record['url'], record['tags'], record['title'])
+
+
+def get_pubyear(record):
+    if record.get('pubyear'):
+        res = re.match('.*([12][0-9][0-9][0-9]).*', record['pubyear'])
+        if res:
+            return int(res.group(1))
+        else:
+            logging.warning('invalid year: {}'.format(record['pubyear']))
+            return None
+    else:
+        return None
+
+
+def extract_marc_data(row, output_fields):
+    for output_field in output_fields:
+        if 'marc_tag' in output_field:
+            for record in pymarc.JSONReader(json.dumps([row['json']])):
+                record_fields = record.get_fields(output_field['marc_tag'])
+                if len(record_fields) > 0:
+                    if output_field.get('first_subfield_only'):
+                        record_field = record_fields[0]
+                        row[output_field['name']] = record_field.format_field()
+                    else:
+                        row[output_field['name']] = ' | '.join([record_field.format_field() for record_field in record_fields])
+                else:
+                    row[output_field['name']] = ''
+        elif 'marc_leader_position' in output_field and 'marc_leader_map' in output_field:
+            key = row['json']['leader'][output_field['marc_leader_position']]
+            row[output_field['name']] = output_field['marc_leader_map'][key]
+    if row.get('item_type_999'):
+        row['item_type'] = row['item_type_999']
+    elif row.get('item_type_leader') == 'Language material' and row.get('bibliographic_level') == 'Monograph/Item':
+        row['item_type'] = 'book'
+    else:
+        row['item_type'] = None
+    if row['item_type']:
+        return row
+    else:
+        logging.warning('could not determine item type: {}'.format((row.get('item_type_999'), row.get('item_type_leader'), row.get('bibliographic_level'))))
+        return None
+
+
+def get_export_url(row):
+    if row['url']:
+        res = re.match('.*(http([^\s]+)).*', row['url'])
+        if res:
+            return res.group(1)
+        else:
+            logging.warning('item with invalid url: {}'.format(row['url']))
+            return None
+    else:
+        logging.warning('item without url')
+        return None
+
+
+def get_export_value(row, k):
+    v = row[k]
+    if not v:
+        return ''
+    elif k == 'json':
+        return json.dumps(v)
+    else:
+        return str(v)
+
+
+def is_valid_export_row(row):
+    if row['url']:
+        return True
+    else:
+        logging.warning('invalid row: missing url')
+        return False
+
+
+def get_export_row(row, export_keys):
+    row['url'] = get_export_url(row)
+    if is_valid_export_row(row):
+        row = {k: get_export_value(row, k) for k, v in row.items() if k in export_keys}
+        return row
+    else:
+        return None

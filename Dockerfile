@@ -15,11 +15,19 @@ ENV LANG C.UTF-8
 RUN curl -L 'https://github.com/frictionlessdata/datapackage-pipelines/archive/master.zip' > datapackage-pipelines.zip &&\
     pip install 'datapackage-pipelines.zip[speedup,develop]'
 RUN pip install pymarc
+RUN pip install pipenv
+
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --deploy
 
 COPY nli_z3950/*.py /nli_z3950/
 COPY setup.py /
 RUN pip install -e .
 
 COPY *.py *.py2 *.sh *.yaml ./
+
+# CCL = more general / user friendly query language
+# CQL = stricter query language
+ENV QUERY_TYPE=CCL
 
 ENTRYPOINT ["./entrypoint.sh"]

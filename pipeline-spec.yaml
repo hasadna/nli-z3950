@@ -132,3 +132,19 @@ search_export:
   - run: dump.to_path
     parameters:
       out-path: data/search_export
+
+
+search_import:
+  pipeline:
+  - run: search_import
+  - run: dump.to_path
+    parameters:
+      out-path: data/search_import
+
+
+search_app_index:
+  pipeline:
+  - run: search_app_index
+  - run: dump.to_path
+    parameters:
+      out-path: data/search_app_index
