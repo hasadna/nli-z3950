@@ -14,7 +14,7 @@ elif [ "${1}" == "gdrive_download" ]; then
 elif [ "${1}" == "serve_search_app" ]; then
     export FLASK_APP=search_app.py
     export FLASK_DEBUG=1
-    flask run -h 0.0.0.0 --without-threads --no-debugger --no-reload
+    flask run -h 0.0.0.0
 else
     dpp $@
     RES=$?

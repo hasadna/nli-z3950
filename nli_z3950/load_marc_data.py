@@ -1,5 +1,6 @@
 import subprocess, logging, json, pymarc, os, re, sys
 from pymarc import JSONReader
+from unidecode import unidecode
 
 
 # https://www.loc.gov/marc/bibliographic/
@@ -36,9 +37,10 @@ def get_marc_records_schema():
                        ]}
 
 
-def load_marc_data(db_name, ccl_query, stats):
+def load_marc_data(db_name, ccl_query, stats, query_type='CCL'):
+    env = {'QUERY_TYPE': query_type}
     res = subprocess.run([os.environ.get('NLI_PYTHON2', "python"), "nli-z3950.py2", db_name, ccl_query],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     sys.stderr.write(res.stderr.decode('utf-8'))
     if res.returncode == 0:
         reader = JSONReader(res.stdout.decode('utf-8'))
@@ -73,12 +75,14 @@ def get_record_key(record):
 
 
 def get_pubyear(record):
-    if record.get('pubyear'):
-        res = re.match('.*([12][0-9][0-9][0-9]).*', record['pubyear'])
+    pubyear = record.get('pubyear')
+    if pubyear:
+        pubyear = unidecode(pubyear)
+        res = re.match('.*([12][0-9][0-9][0-9]).*', pubyear)
         if res:
             return int(res.group(1))
         else:
-            logging.warning('invalid year: {}'.format(record['pubyear']))
+            logging.warning('invalid year: {}'.format(pubyear))
             return None
     else:
         return None

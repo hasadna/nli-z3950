@@ -5,7 +5,8 @@ import logging
 from openpyxl import load_workbook
 import search_import
 from nli_z3950.load_marc_data import get_record_key
-import os
+import os, json, csv
+from datetime import datetime
 
 
 def get_all_gdrive_migdar_ids():
@@ -16,6 +17,27 @@ def get_all_gdrive_migdar_ids():
             all_migdar_ids.add(str(row['migdar_id']))
     return all_migdar_ids
 
+
+def get_all_gdrive_record_keys_cached(ttl=3600, noncache=False):
+    load_from_cache = False
+    if not noncache:
+        if os.path.exists('data/search_app_index_cache/metadata.json'):
+            with open('data/search_app_index_cache/metadata.json') as f:
+                metadata = json.load(f)
+                load_from_cache = datetime.now().timestamp() - metadata['last_update_timestamp'] <= ttl
+    if load_from_cache:
+        with Stream('data/search_app_index_cache/data.csv', headers=0) as stream:
+            for row in stream.iter(keyed=False):
+                yield {'migdar_id': row[0], 'record_key': row[1]}
+    else:
+        os.makedirs('data/search_app_index_cache', exist_ok=True)
+        with open('data/search_app_index_cache/data.csv', 'w') as f:
+            csvwriter = csv.writer(f)
+            for row in get_all_gdrive_record_keys():
+                csvwriter.writerow([row['migdar_id'], row['record_key']])
+                yield row
+        with open('data/search_app_index_cache/metadata.json', 'w') as f:
+            json.dump({'last_update_timestamp': datetime.now().timestamp()}, f)
 
 def get_all_gdrive_record_keys():
     schema, sheets = search_import.load_sheets()
