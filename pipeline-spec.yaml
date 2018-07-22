@@ -148,3 +148,35 @@ search_app_index:
   - run: dump.to_path
     parameters:
       out-path: data/search_app_index
+
+
+search_export_haifa_files:
+  pipeline:
+  - run: search_haifa_files
+    parameters:
+      # source: https://drive.google.com/drive/folders/1BTN3Wka-355GbY9pJJayTn8f1d_H1UT-
+      files-path-template: data/haifa-files/neaman{filenum}.xml
+      filenums: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+#      filenums: [1]
+  - run: duplicate
+    parameters:
+      source: search_haifa_files
+      target-name: search_export_haifa_files
+      target-path: search_export_haifa_files.xlsx
+  - run: search_export_haifa_files
+  - run: dump.to_path
+    parameters:
+      out-path: data/search_export_haifa_files
+      force-format: false
+      counters:
+        resource-hash: ''
+      file-formatters:
+        xlsx: [nli_z3950.file_formats, XLSXFormat]
+  - run: dump.to_zip
+    parameters:
+      out-file: data/search_export_haifa_files.zip
+      force-format: false
+      counters:
+        resource-hash: ''
+      file-formatters:
+        xlsx: [nli_z3950.file_formats, XLSXFormat]

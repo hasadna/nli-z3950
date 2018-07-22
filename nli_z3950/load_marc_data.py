@@ -3,6 +3,9 @@ from pymarc import JSONReader
 from unidecode import unidecode
 
 
+MIN_YEAR = 2005
+
+
 # https://www.loc.gov/marc/bibliographic/
 # Relevant fields for NLI z3950 data
 # fields with less then 3 chars will cause to extract all the fields that match this prefix
@@ -46,28 +49,33 @@ def load_marc_data(db_name, ccl_query, stats, query_type='CCL'):
         reader = JSONReader(res.stdout.decode('utf-8'))
         stats["num records"] = 0
         for record in reader:
-            row = {"title": record.title(),
-                   "pubyear": record.pubyear(),
-                   "publisher": record.publisher(),
-                   "uniformtitle": record.uniformtitle(),
-                   "author": record.author(),
-                   "isbn": record.isbn(),
-                   "json": record.as_json(),}
-            raw = {field_name: [] for field_name in list(set(nli_metadata_fields.values()))}
-            json_records_string = '[' + json.dumps(json.loads(row["json"])) + ']'
-            for record in pymarc.JSONReader(json_records_string):
-                for field in record.get_fields():
-                    for match_tag in [field.tag, field.tag[:2], field.tag[:1]]:
-                        field_name = nli_metadata_fields.get(match_tag)
-                        if field_name:
-                            raw_values = raw.setdefault(field_name, [])
-                            raw_values += [field.format_field()]
-            row.update(**{k: ', '.join(v) for k, v in raw.items()})
+            row = parse_record(record)
             stats["num records"] += 1
             yield row
     else:
         sys.stderr.write(res.stdout.decode('utf-8'))
         raise Exception()
+
+
+def parse_record(record):
+    row = {"title": record.title(),
+           "pubyear": record.pubyear(),
+           "publisher": record.publisher(),
+           "uniformtitle": record.uniformtitle(),
+           "author": record.author(),
+           "isbn": record.isbn(),
+           "json": record.as_json(), }
+    raw = {field_name: [] for field_name in list(set(nli_metadata_fields.values()))}
+    json_records_string = '[' + json.dumps(json.loads(row["json"])) + ']'
+    for record in pymarc.JSONReader(json_records_string):
+        for field in record.get_fields():
+            for match_tag in [field.tag, field.tag[:2], field.tag[:1]]:
+                field_name = nli_metadata_fields.get(match_tag)
+                if field_name:
+                    raw_values = raw.setdefault(field_name, [])
+                    raw_values += [field.format_field()]
+    row.update(**{k: ', '.join(v) for k, v in raw.items()})
+    return row
 
 
 def get_record_key(record):

@@ -12,6 +12,7 @@ google-auth = "*"
 openpyxl = "*"
 flask = "*"
 python-slugify = "*"
+"737c3a5" = {file = "https://github.com/OriHoch/datapackage-pipelines/archive/dump-to-path-add-support-for-custom-formats.zip"}
 
 [dev-packages]
 

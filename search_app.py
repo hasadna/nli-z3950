@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, send_file
 from nli_z3950.load_marc_data import (load_marc_data, get_record_key, get_marc_records_schema, get_pubyear,
-                                      extract_marc_data, get_export_row)
+                                      extract_marc_data, get_export_row, MIN_YEAR)
 import uuid, csv, datetime, json, os, openpyxl, yaml, logging, sys
 from slugify import slugify
 from tabulator import Stream
@@ -24,7 +24,6 @@ app = Flask(__name__)
 @app.route('/search/<search_query>/<search_text>/<language>/<noncache>')
 def search(search_query, search_text, language, noncache):
     all_gdrive_record_keys = [row['record_key'] for row in get_all_gdrive_record_keys_cached(noncache=(noncache == 'true'))]
-    min_year = 2005
     res = {'csv_records': 0,
            'xlsx_records': 0,
            'total_records': 0,
@@ -48,7 +47,7 @@ def search(search_query, search_text, language, noncache):
         for record_num, record in enumerate(load_marc_data("ULI02", search_query, {}, 'PQF')):
             record_key = get_record_key(record)
             pubyear = get_pubyear(record)
-            if not pubyear or pubyear < min_year:
+            if not pubyear or pubyear < MIN_YEAR:
                 logging.warning('invalid pubyear: {}'.format(record_key))
             elif record_key in all_gdrive_record_keys:
                 logging.warning('already in gdrive: {}'.format(record_key))
