@@ -182,7 +182,7 @@ search_export_haifa_files:
         xlsx: [nli_z3950.file_formats, XLSXFormat]
 
 
-search_export_knesset_women_committee_background_material:
+search_export_knesset_data:
   pipeline:
   - run: load_resource
     parameters:
@@ -201,15 +201,7 @@ search_export_knesset_women_committee_background_material:
     parameters:
       url: http://storage.googleapis.com/knesset-data-pipelines/data/committees/kns_documentcommitteesession/datapackage.json
       resource: kns_documentcommitteesession
-  - run: search_export_knesset_women_committee_background_material
-#  - run: dump.to_path
-#    parameters:
-#      out-path: data/search_export_knesset_women_committee_background_material
+  - run: search_export_knesset_data
   - run: dump.to_path
     parameters:
-      out-path: data/search_export_knesset_women_committee_background_material
-      force-format: false
-      counters:
-        resource-hash: ''
-      file-formatters:
-        xlsx: [nli_z3950.file_formats, XLSXFormat]
+      out-path: data/search_export_knesset_data
