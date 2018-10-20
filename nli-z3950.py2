@@ -32,7 +32,10 @@ while True:
     conn.preferredRecordSyntax = 'USMARC'
     conn.elementSetName = 'F'
     # TODO: check if this actually supports pagination, not sure..
-    sys.stderr.write('{} = {}'.format(os.environ.get('QUERY_TYPE', 'CCL'), ccl_query))
+    try:
+        sys.stderr.write('{} = {}'.format(os.environ.get('QUERY_TYPE', 'CCL'), ccl_query))
+    except Exception:
+        sys.stderr.write('{} = ({})'.format(os.environ.get('QUERY_TYPE', 'CCL'), len(ccl_query)))
     for r in conn.search(zoom.Query(os.environ.get('QUERY_TYPE', 'CCL'), ccl_query))[i:i+max_records_per_page]:
         for record in pymarc.MARCReader(r.data):
             if marc_separator:
