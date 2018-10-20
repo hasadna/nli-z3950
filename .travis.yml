@@ -1,0 +1,17 @@
+language: bash
+sudo: required
+env:
+  global:
+  - TRAVIS_CI_OPERATOR=1
+  - secure: "WGA4bsh5fXUM/ovcnizfvEaZ4vbRQirtEwgzNsxaAT7h1v4ZASnqHjrxZst/nEyNMu+rOsPm37+iNWuW1FgwRPMcF4gbY9c8GhivtZn/PAFoD+hBPAmPv8q2XWzqLAWexocpmg7juI0vGoGD6A+rgn+S2qHnGnwcAOZG1cBI1EG7+7ozJx7VrED8NSR8YfcPFymixf/TbMpyW0PCVdLcexJIhjcAfWgkO8EccZbKRA/tGfEITbe0vtNC7bg5rYkoXry+a9YpIFfDg+N0Y5UCBO+DU/N5OUh2T2RcD9r20lMqkw9BTh4AEG+AWHqTCW/G70O8lIX+HvKRrpOnpz1OM3kxKKyvdSJXYES3z/1LVHymOOPtdzXCOdbkc6dS4/U2e71Gxoe/2NX8HYHJ84+yyIvhpPcLgZHpUKP+LCG2kFcZK1eRlbzDeUc+MTA5vDirKg/qxc2l7UmMgaA25wSw/mY2XUg/DP2van+3H/GPRspamSWdiEySNVTxKaB5Jm43A8DIN+tMggtUZAD3Kl+onrTTqRKS+X2fZuiZyZmL7zmlG02wjZDm5g5i1qubm8MpcVmQ2JWD3qWK+RuWO5z7NazP7xMhVwSVD56sd++C7nOqlTP6W6V6HJmCQT6Gi+fjVbOEYT+U4P+MuuWVqCkZ2ZXrasCweIEMXFWTN4XBrUE="
+  - secure: "DRiasF5kUuRJFmc3xHveiI5bIJnrSfWhuIxLD40Uw5KCQVrmeMuftR3ZzJDWiajThuI4zcsdFujfsNVrzqBs4T9XIL1Z27VX8HYwJ67XA2CUUtUqo6qVPPf9DHteP+Oqw+zI9KVq0twC9ySd0+RHijJ8zZ+zvkpA1UoyAHTshGDC7sfWwUgidzUjaEoMSDCJ1yLGO16TtNGrwhfOzXb8bJGQ0ROtzHA579WLve+38N3rsCtqaykuorBygH0qeSYhSVWVLGsMnJmbpXZAbloR0HMrmvJh6I2kfXElmz8FtmLrs0zkzXh6TCM3Z/GeRsnvrtr255wE+PAqukApadMb6niKj0sx/r5QuJ+gqF8OBdJBV7q3iO6UucpY7fklOy7bw99f/8XIRqxvaE8zSgZwpJe9mzk8FHF20hfth5JjPaT3T4wRsWGJlDBfb8rs0+w92V+p96mGk3xhf8P9dj9m6hEW/XzmS2kNPH/od48OddRlVs4EKHAto/FU+/agH6uIToyd7N+Qnv7lJDGJVGf7PDCmqHuet7EhtykUW2VNKRPPMLkWVFDtP9IQ3C6D45Z0I0zSWDMuh2881aJ52ObPzA015ek8bCWveIUgEzv8QnerXBL8nX2us4BQM3WFqeioIbO2iUJuqM8AwuyixJsWvV1J2YNZGcjy6ykeMj+2Ums="
+  - DOCKER_IMAGE=uumpa/hasadna-nli-z3950
+services:
+- docker
+install:
+- bash .travis.sh install
+script:
+- bash .travis.sh script
+deploy:
+  provider: script
+  script: bash .travis.sh deploy
