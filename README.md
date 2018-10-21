@@ -55,3 +55,23 @@ NLI_PYTHON2=python2 MAX_RECORDS=50 dpp run --verbose ./search
 sudo chown -R $USER data
 gsutil -m rsync -r ./data gs://knesset-data-pipelines/hasadna-migdar-data/$USER-`date +%Y-%m-%d_%H-%m`
 ```
+
+### Jupyter Lab
+
+Activate the virtualenv
+
+```
+pipenv shell
+```
+
+Install Jupyter
+
+```
+pip install jupyter jupyterlab ipython
+```
+
+Start Jupyter lab
+
+```
+jupyter lab
+```
