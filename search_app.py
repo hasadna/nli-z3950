@@ -21,7 +21,7 @@ def get_preview_record(record):
 app = Flask(__name__)
 
 
-@app.route('/search/<search_query>/<search_text>/<language>/<noncache>')
+@app.route('/__search/<search_query>/<search_text>/<language>/<noncache>')
 def search(search_query, search_text, language, noncache):
     all_gdrive_record_keys = [row['record_key'] for row in get_all_gdrive_record_keys_cached(noncache=(noncache == 'true'))]
     res = {'csv_records': 0,
@@ -84,7 +84,7 @@ def search(search_query, search_text, language, noncache):
     return res
 
 
-@app.route('/download/<search_id>.<extension>')
+@app.route('/__download/<search_id>.<extension>')
 def download(search_id, extension):
     csv_file_name = 'data/search_app/{}/records.csv'.format(search_id)
     xlsx_file_name = 'data/search_app/{}/records.xlsx'.format(search_id)
