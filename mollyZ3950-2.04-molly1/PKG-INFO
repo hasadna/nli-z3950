@@ -1,0 +1,17 @@
+Metadata-Version: 1.0
+Name: mollyZ3950
+Version: 2.04-molly1
+Summary: Z39.50 (ZOOM API), ASN.1, and MARC implementations
+Home-page: UNKNOWN
+Author: Aaron Lav, now maintained by Oxford University Computing Services
+Author-email: mobileoxford@oucs.ox.ac.uk
+License: X
+Description: Pure Python implementation of ASN.1 and Z39.50 v3,
+               with a simple MARC parser thrown in.  See the URL for details.
+               This is a fork of Aaron Lav's original PyZ3950, now maintained by the
+               Mobile Oxford team at Oxford University Computing Services
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Topic :: Internet :: Z39.50
