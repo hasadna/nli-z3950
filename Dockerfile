@@ -2,8 +2,8 @@ FROM ubuntu:trusty
 RUN apt-get update && apt-get install -y --force-yes curl python-pip software-properties-common python-software-properties \
                                          libleveldb-dev libleveldb1
 
-COPY mollyZ3950-2.04-molly1.tar.gz ./mollyZ3950-2.04-molly1.tar.gz
-RUN pip install ./mollyZ3950-2.04-molly1.tar.gz &&\
+COPY mollyZ3950-2.04-molly1 ./mollyZ3950-2.04-molly1
+RUN pip install -e mollyZ3950-2.04-molly1 &&\
     pip install pymarc
 RUN add-apt-repository -y ppa:deadsnakes/ppa && apt-get update && apt-get install -y python3.6 python3.6-dev
 RUN curl https://bootstrap.pypa.io/get-pip.py > get-pip.py && python3.6 ./get-pip.py
