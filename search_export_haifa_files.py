@@ -2,6 +2,8 @@ from datapackage_pipelines.wrapper import process
 import yaml
 from functools import lru_cache
 from nli_z3950 import load_marc_data
+from nli_z3950 import parse_bib_data
+import json
 
 
 @lru_cache(maxsize=1)
@@ -27,6 +29,9 @@ def process_row(row, row_index, spec, resource_index, parameters, stats):
         if record:
             record = load_marc_data.get_export_row(record, export_keys())
             if record:
+                bib_data = parse_bib_data.parse_marc_bib_data(json.loads(record['json']))
+                for field in parse_bib_data.BIB_DATA_SUBFIELD_NAMES.values():
+                    record[field] = bib_data.get(field, '')
                 del record['json']
                 stats['export_rows'] += 1
                 row = record
@@ -40,6 +45,7 @@ def modify_datapackage(datapackage, parameters, stats):
             fields = [{'name': k, 'type': 'string'}
                       for k in export_keys()
                       if k != 'json']
+            fields += [{'name': field, 'type': 'string'} for field in parse_bib_data.BIB_DATA_SUBFIELD_NAMES.values()]
             descriptor['schema']['fields'] = fields
     return datapackage
 
