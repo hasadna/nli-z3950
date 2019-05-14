@@ -1,0 +1,4 @@
+datapackage-pipelines[speedup,develop]==1.7.1
+pymarc
+pipenv
+google-api-python-client==1.7.4
