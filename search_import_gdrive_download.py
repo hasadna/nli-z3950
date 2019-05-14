@@ -21,7 +21,7 @@ def main():
     else:
         existing_files = {}
     logging.info('downloading files to data/search_import')
-    results = drive_service.files().list(q="'1-J9ox-6Zy9b3CdFNev3FtMmKsdWjYmeq' in parents", fields='files(id,kind,name,mimeType,modifiedTime)').execute()
+    results = drive_service.files().list(q="'16bSopg9nlQDBN8gsjW712xuBWy16gPW0' in parents", fields='files(id,kind,name,mimeType,modifiedTime)').execute()
     items = results.get('files', [])
     if items:
         assert not os.path.exists('data/search_import/temp_index.csv')
